@@ -29,6 +29,7 @@ public class Task {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
+    @NotNull(message = "Please enter task name")
     @NotEmpty(message = "Please enter task name")
     @Column(name = "name")
     private String name;

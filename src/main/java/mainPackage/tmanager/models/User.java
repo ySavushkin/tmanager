@@ -25,16 +25,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @NotNull(message = "Username should be not null")
     @NotEmpty(message = "Username field can't be empty")
     @Column(name = "username")
     private String username;
 
+    @NotNull(message = "Email should be not null")
     @NotEmpty(message = "Email field can't be empty")
     @Email(message = "The email you provided is not valid")
     @Column(name = "email")
     private String email;
 
-    @NotEmpty
+    @NotNull(message = "Provide password")
+    @NotEmpty(message = "Provide password")
     @Column(name = "password")
     private String password;
 
