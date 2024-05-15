@@ -32,10 +32,7 @@ public class TaskService {
     }
 
     @Transactional
-    public void saveTaskWithFile(Task task, MultipartFile file) {
-        // Save the task
-        task.setCreatedAt(LocalDateTime.now());
-        taskRepository.save(task);
+    public void attachFile (Task task, MultipartFile file) {
 
         // Process and save the file
         if (!file.isEmpty()) {

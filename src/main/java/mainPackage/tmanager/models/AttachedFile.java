@@ -36,8 +36,9 @@ public class AttachedFile {
     private byte[] fileData;
 
     @ManyToOne
-    @JoinColumn(name = "task_id", referencedColumnName = "id")
+    @JoinColumn(name = "task_id")
     private Task task;
-
 }
+
+
 

@@ -47,9 +47,10 @@ public class Task {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "task")
-    private List<AttachedFile> attachedFiles; // Множественное отношение к AttachedFile
-
-
-
+    private List<AttachedFile> attachedFiles;
 }
+
+
+
+
 

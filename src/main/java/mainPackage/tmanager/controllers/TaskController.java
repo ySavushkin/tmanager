@@ -41,15 +41,17 @@ public class TaskController {
 //        }
 //    }
 @PostMapping
-public ResponseEntity<?> createNewTask(@RequestBody @Valid Task task, BindingResult bindingResult,
-                                       @RequestParam("file") MultipartFile file) {
-
-    // Validation and save task
+public ResponseEntity<?> createNewTask(@RequestParam("task") @Valid Task task, BindingResult bindingResult,
+                                       @RequestParam("file") MultipartFile [] files) {
+        // Validation and save task
     if (bindingResult.hasErrors()) {
         return ResponseEntity.badRequest().body(bindingResult.getFieldError());
     } else {
-        taskService.saveTaskWithFile(task, file);
+        taskService.save(task);
+        for (MultipartFile multipartFile : files) {
+        taskService.attachFile(task, multipartFile);
+        }
         return ResponseEntity.ok().body("Task created successfully");
     }
-}
+    }
 }

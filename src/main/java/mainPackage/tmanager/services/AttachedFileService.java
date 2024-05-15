@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,10 +26,11 @@ public class AttachedFileService {
     @Transactional
     public void attachFileToTask(Task task, AttachedFile file){
     if(task.getAttachedFiles().isEmpty()) {
-        task.setAttachedFiles(new ArrayList<>().add(file));
+        ArrayList<AttachedFile> fileList = new ArrayList<>();
+        fileList.add(file);
+        task.setAttachedFiles(fileList);
     }
-    task.setAttachedFiles();
-    }
+}
 
     @Transactional
     public void  save(AttachedFile file){
