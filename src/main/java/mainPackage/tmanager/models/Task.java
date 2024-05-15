@@ -46,8 +46,9 @@ public class Task {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "task")
-    private AttachedFile attachedFile;
+    @OneToMany(mappedBy = "task")
+    private List<AttachedFile> attachedFiles; // Множественное отношение к AttachedFile
+
 
 
 }

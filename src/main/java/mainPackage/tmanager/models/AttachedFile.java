@@ -1,10 +1,13 @@
 package mainPackage.tmanager.models;
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+
 
 @Entity
 @Data
@@ -19,7 +22,22 @@ public class AttachedFile {
     @Column(name = "file_id")
     private int id;
 
-    @OneToOne
-    @JoinColumn(name = "task_id", referencedColumnName = "task_id")
+    @Column(name = "file_name")
+    private String fileName;
+
+    @Column(name = "file_size")
+    private long fileSize;
+
+    @Column(name = "file_type")
+    private String fileType;
+
+    @Lob
+    @Column(name = "file_data")
+    private byte[] fileData;
+
+    @ManyToOne
+    @JoinColumn(name = "task_id", referencedColumnName = "id")
     private Task task;
+
 }
+
