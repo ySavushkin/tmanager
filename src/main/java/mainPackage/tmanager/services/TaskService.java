@@ -7,24 +7,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 public class TaskService {
     private final TaskRepository taskRepository;
+    private final AttachedFileService attachedFileService;
+
     @Autowired
-    public TaskService(TaskRepository taskRepository) {
+    public TaskService(TaskRepository taskRepository, AttachedFileService attachedFileService) {
         this.taskRepository = taskRepository;
+        this.attachedFileService = attachedFileService;
     }
 
     /**
      * Сохраняет задачу в репозитории и устанавливает время создания.
+     *
      * @param task Задача для сохранения.
      */
     @Transactional
-    public void save(Task task){
+    public void save(Task task) {
         task.setCreatedAt(LocalDateTime.now());
         taskRepository.save(task);
     }
 
+
+    public Optional<Task> findById(int taskId) {
+        return taskRepository.findById(taskId);
+    }
 }
+
+
