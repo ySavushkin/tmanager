@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
+
+import java.util.Optional;
 
 
 @Entity
@@ -31,13 +32,15 @@ public class AttachedFile {
     @Column(name = "file_type")
     private String fileType;
 
-    @Lob
-    @Column(name = "file_data")
-    private byte[] fileData;
+
+    @Column(name = "file_link")
+    private String fileLink;
 
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
+
+
 }
 
 
