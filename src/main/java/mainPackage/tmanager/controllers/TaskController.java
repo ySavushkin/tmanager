@@ -10,7 +10,9 @@ import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.services.AttachedFileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import mainPackage.tmanager.services.TaskService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,9 @@ import java.util.*;
 public class TaskController {
     private final TaskService taskService;
     private final AttachedFileService attachedFileService;
+
+    @Value("${filePath}")
+    private String filePath;
 
     @Autowired
     public TaskController(TaskService taskService, AttachedFileService attachedFileService) {
@@ -86,24 +91,53 @@ public class TaskController {
         }
     }
 
+    @GetMapping("/get-file/{fileId}")
+    public ResponseEntity<?> getFile(@PathVariable int fileId) throws IOException {
+        Optional<AttachedFile> attachedFile = attachedFileService.findById(fileId);
+
+        if (attachedFile.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("File not found with id: " + fileId);
+        }
+
+        byte[] downloadFile = downloadFileFromFileDirectory(attachedFile.get().getFileName());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.parseMediaType(attachedFile.get().getFileType()))
+                .body(downloadFile);
+
+    }
+
     public void processFile(int taskId, MultipartFile multipartFile, AttachedFile attachedFile) throws IOException {
         // Обработка файла и привязка к задаче
         Optional<Task> task = taskService.findById(taskId); // Получаем задачу по taskId
         if (task != null) {
             String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-            String relativePath = "Files/" + fileName;
-            attachedFile.setFileName(multipartFile.getOriginalFilename());
+            String relativePath = filePath +"\\"+ fileName;
+            attachedFile.setFileName(fileName);
             attachedFile.setFileType(multipartFile.getContentType());
             attachedFile.setFileLink(relativePath);
             attachedFile.setFileSize(multipartFile.getSize());
-
-            String uploadDirectory = "/Users/rusleak/IdeaDoNotDeleteProjects/tmanager/src/main/resources/Files";
+            String uploadDirectory = filePath;
             File newFile = new File(uploadDirectory, fileName);
             multipartFile.transferTo(newFile);
             Task task1 = task.get();
             attachedFile.setTask(task1); // Установка связи с задачей
             attachedFileService.save(attachedFile);
         }
+    }
+
+    public byte[] downloadFileFromFileDirectory(String fileName) throws IOException {
+
+        Optional<AttachedFile> fileDataObj = attachedFileService.findByName(fileName);
+
+        //first need to get the file path
+        String filePath = fileDataObj.get().getFileLink();
+
+        //got the file, now decompress it.
+        byte[] imageFile = Files.readAllBytes(new java.io.File(filePath).toPath());
+
+        return imageFile;
     }
 
 }
