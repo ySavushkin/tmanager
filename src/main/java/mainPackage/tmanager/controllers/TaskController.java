@@ -3,11 +3,13 @@ package mainPackage.tmanager.controllers;
 import jakarta.validation.Valid;
 import mainPackage.tmanager.models.AttachedFile;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 
 import mainPackage.tmanager.models.Task;
+import mainPackage.tmanager.models.User;
 import mainPackage.tmanager.services.AttachedFileService;
+import mainPackage.tmanager.services.MailService;
+import mainPackage.tmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import mainPackage.tmanager.services.TaskService;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Paths;
 import java.util.*;
 
 @RestController
@@ -26,14 +27,19 @@ import java.util.*;
 public class TaskController {
     private final TaskService taskService;
     private final AttachedFileService attachedFileService;
+    private final UserService userService;
+    private final MailService mailService;
 
     @Value("${filePath}")
     private String filePath;
 
     @Autowired
-    public TaskController(TaskService taskService, AttachedFileService attachedFileService) {
+    public TaskController(TaskService taskService, AttachedFileService attachedFileService, UserService userService, MailService mailService) {
         this.taskService = taskService;
         this.attachedFileService = attachedFileService;
+        this.userService = userService;
+
+        this.mailService = mailService;
     }
 
     //--------------------------------------------------------------------------------------------------
@@ -113,7 +119,7 @@ public class TaskController {
         Optional<Task> task = taskService.findById(taskId); // Получаем задачу по taskId
         if (task != null) {
             String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-            String relativePath = filePath +"\\"+ fileName;
+            String relativePath = filePath + File.separator + fileName;
             attachedFile.setFileName(fileName);
             attachedFile.setFileType(multipartFile.getContentType());
             attachedFile.setFileLink(relativePath);
@@ -139,6 +145,36 @@ public class TaskController {
 
         return imageFile;
     }
+
+    @PostMapping("/set-user/{taskId}")
+    public ResponseEntity<?> setUser(@PathVariable("taskId") int taskId, @RequestBody User user) {
+        // Проверяем, существует ли задача с заданным ID
+        Optional<Task> taskOptional = taskService.findById(taskId);
+        if (taskOptional.isPresent()) {
+            Task task = taskOptional.get();
+
+            // Проверяем, существует ли пользователь с заданным ID
+            Optional<User> existingUserOptional = userService.findById(user.getId());
+            if (existingUserOptional.isPresent()) {
+                User existingUser = existingUserOptional.get();
+                task.setUser(existingUser);
+                //----------------
+                //НУЖНо allow less secure app
+                //НО ЭТА ФУНКЦИЯ ОТКЛЮЧЕНА В гугл
+//                mailService.sendEmail(existingUser);
+                //----------------
+                taskService.save(task); // Сохраняем изменения в БД
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("User not found with id: " + user.getId(), HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>("Task not found with id: " + taskId, HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
 
 }
 

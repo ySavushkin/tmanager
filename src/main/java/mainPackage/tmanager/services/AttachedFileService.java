@@ -27,7 +27,7 @@ public class AttachedFileService {
         attachedFileRepo.save(file);
     }
 
-    @Transactional
+
     public Optional<AttachedFile> findById(int fileid){return attachedFileRepo.findById(fileid);}
 
     public Optional<AttachedFile> findByName(String fileName){return attachedFileRepo.findByFileName(fileName);}
