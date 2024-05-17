@@ -1,20 +1,13 @@
 package mainPackage.tmanager.services;
 
 import mainPackage.tmanager.models.AttachedFile;
-import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.repositories.AttachedFileRepo;
 import mainPackage.tmanager.repositories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +26,11 @@ public class AttachedFileService {
     public void save(AttachedFile file) {
         attachedFileRepo.save(file);
     }
+
+
+    public Optional<AttachedFile> findById(int fileid){return attachedFileRepo.findById(fileid);}
+
+    public Optional<AttachedFile> findByName(String fileName){return attachedFileRepo.findByFileName(fileName);}
 }
 
 

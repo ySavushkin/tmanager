@@ -8,6 +8,7 @@ public class TmanagerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TmanagerApplication.class, args);
+		System.out.println("Hello tmanager");
 	}
 
 }
