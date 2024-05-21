@@ -1,7 +1,6 @@
 package mainPackage.tmanager.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -17,20 +16,16 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "task")
-public class Task {
+@Table(name = "project")
+public class Project {
 
     @Id
-    @Column(name = "task_id")
+    @Column(name = "project_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private User user;
-
-    @NotNull(message = "Please enter task name")
-    @NotEmpty(message = "Please enter task name")
+    @NotNull(message = "Please enter project name")
+    @NotEmpty(message = "Please enter project name")
     @Column(name = "name")
     private String name;
 
@@ -46,16 +41,12 @@ public class Task {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "task")
-    private List<AttachedFile> attachedFiles;
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Task> taskList;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
-    private Project project;
+
+
+//    @Column(name = "admins")
+
 
 }
-
-
-
-
-
