@@ -49,6 +49,7 @@ public class ProjectController {
     * Method should be used when person is creating Project,
     * so he automatically becomes an admin
     * */
+    //TODO ПЕРЕДЕЛАТЬ userId на @RequestBody
     @PostMapping("/new/{userId}")
     public ResponseEntity<?> createProjectUser(@RequestBody @Valid Project project, BindingResult bindingResult,
                                                @PathVariable("userId") int userId) {
@@ -71,7 +72,7 @@ public class ProjectController {
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
+    //TODO Сделать в таск контроллере и переделать на реквест бади
     @PostMapping("/attach-task/{projectId}/{taskId}")
     private ResponseEntity<?> attachTask(@PathVariable("projectId") int projectId,
                                          @PathVariable("taskId") int taskId) {
