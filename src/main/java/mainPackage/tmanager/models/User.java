@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mainPackage.tmanager.enums.UserRoleInProject;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,6 +48,14 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private UserRoleInProject role;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Task> tasks;
+
+    @ManyToMany(mappedBy = "users")
+    private List<Project> projects;
 }
+

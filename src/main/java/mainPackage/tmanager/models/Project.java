@@ -44,9 +44,14 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Task> taskList;
 
+    @ManyToMany
+    @JoinTable(
+            name = "project_user",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
 
-
-//    @Column(name = "admins")
 
 
 }
