@@ -5,17 +5,16 @@ import mainPackage.tmanager.models.AttachedFile;
 import java.nio.file.Files;
 
 
+import mainPackage.tmanager.models.Project;
 import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.models.User;
-import mainPackage.tmanager.services.AttachedFileService;
-import mainPackage.tmanager.services.MailService;
-import mainPackage.tmanager.services.UserService;
+import mainPackage.tmanager.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import mainPackage.tmanager.services.TaskService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,17 +28,19 @@ public class TaskController {
     private final AttachedFileService attachedFileService;
     private final UserService userService;
     private final MailService mailService;
+    private  final ProjectService projectService ;
 
     @Value("${filePath}")
     private String filePath;
 
     @Autowired
-    public TaskController(TaskService taskService, AttachedFileService attachedFileService, UserService userService, MailService mailService) {
+    public TaskController(TaskService taskService, AttachedFileService attachedFileService, UserService userService, MailService mailService, ProjectService projectService) {
         this.taskService = taskService;
         this.attachedFileService = attachedFileService;
         this.userService = userService;
 
         this.mailService = mailService;
+        this.projectService = projectService;
     }
 
     //--------------------------------------------------------------------------------------------------
@@ -79,10 +80,18 @@ public class TaskController {
 //    attachedFileService.save(attachedFile);
 //}
     //--------------------------------------------------------------------------------------------------
-    @PostMapping("/create")
-    public ResponseEntity<?> createTask(@RequestBody @Valid Task task) {
-        taskService.save(task);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseEntity(HttpStatus.OK));
+    @PostMapping("/create/{projectId}")
+    public ResponseEntity<?> createTask(@RequestBody @Valid Task task,
+                                        BindingResult bindingResult,
+                                        @PathVariable("projectId") int projectId) {
+        if(bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
+        } else {
+            Optional<Project> project = projectService.findById(projectId);
+            task.setProject(project.get());
+            taskService.save(task);
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseEntity(HttpStatus.OK));
+        }
     }
 
     @PostMapping("/upload-file/{taskId}")

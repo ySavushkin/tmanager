@@ -36,67 +36,34 @@ public class ProjectController {
         this.userService = userService;
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<?> createProject(@RequestBody @Valid Project project, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
-        } else {
-            projectService.save(project);
-        }
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
     /*
     * Method should be used when person is creating Project,
-    * so he automatically becomes an admin
+    * so user automatically becomes an admin
     * */
-    //TODO ПЕРЕДЕЛАТЬ userId на @RequestBody
     @PostMapping("/new/{userId}")
     public ResponseEntity<?> createProjectUser(@RequestBody @Valid Project project, BindingResult bindingResult,
-                                               @PathVariable("userId") int userId) {
+                                               @RequestBody User user) {
         if (bindingResult.hasErrors()) {
             ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         } else {
-            Optional<User> user = userService.findById(userId);
-            if(user.isPresent()) {
 
                 projectService.save(project);
 
                 UserRoleInProject userRoleInProject = new UserRoleInProject();
-                userRoleInProject.setUser(user.get());
+                userRoleInProject.setUser(user);
                 userRoleInProject.setProject(project);
                 userRoleInProject.setRole(mainPackage.tmanager.enums.UserRoleInProject.ADMIN);
                 userRoleInProjectService.save(userRoleInProject);
 
 
             }
-        }
         return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-    //TODO Сделать в таск контроллере и переделать на реквест бади
-    @PostMapping("/attach-task/{projectId}/{taskId}")
-    private ResponseEntity<?> attachTask(@PathVariable("projectId") int projectId,
-                                         @PathVariable("taskId") int taskId) {
-
-        Optional<Task> task = taskService.findById(taskId);
-        Optional<Project> project = projectService.findById(projectId);
-
-        if (task.isPresent() && project.isPresent()) {
-
-
-            Project project1 = project.get();
-            task.get().setProject(project1);
-
-
-            taskService.save(task.get());
-        } else {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.OK);
     }
 
 
     @PostMapping("/attach-people/{projectId}")
     public ResponseEntity<?> attachPeople(@PathVariable("projectId") int projectId,
+                                          @RequestBody List<User> userList,
                                           @RequestBody User user) {
         Optional<Project> optionalProject = projectService.findById(projectId);
 
@@ -104,10 +71,18 @@ public class ProjectController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        Project project = optionalProject.get();
-        project.getUsers().add(user); // Добавляем пользователя к списку пользователей проекта
+        if(!userList.isEmpty()){
+            for(User u : userList ){
+               u.setRole(mainPackage.tmanager.enums.UserRoleInProject.MEMBER);
+                u.getProjects().add(optionalProject.get());
+                userService.save(u);
+            }
+        } else {
+            user.setRole(mainPackage.tmanager.enums.UserRoleInProject.MEMBER);
+            user.getProjects().add(optionalProject.get());
+            userService.save(user);
+        }
 
-        projectService.save(project); // Сохраняем проект в базе данных
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

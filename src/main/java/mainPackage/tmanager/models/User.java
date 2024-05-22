@@ -55,5 +55,8 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Task> tasks;
 
+    @ManyToMany(mappedBy = "users")
+    private List<Project> projects;
+
 }
 
