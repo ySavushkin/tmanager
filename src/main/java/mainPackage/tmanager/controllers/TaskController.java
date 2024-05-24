@@ -80,15 +80,12 @@ public class TaskController {
 //    attachedFileService.save(attachedFile);
 //}
     //--------------------------------------------------------------------------------------------------
-    @PostMapping("/create/{projectId}")
+    @PostMapping("/create")
     public ResponseEntity<?> createTask(@RequestBody @Valid Task task,
-                                        BindingResult bindingResult,
-                                        @PathVariable("projectId") int projectId) {
+                                        BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         } else {
-            Optional<Project> project = projectService.findById(projectId);
-            task.setProject(project.get());
             taskService.save(task);
             return ResponseEntity.status(HttpStatus.OK).body(new ResponseEntity(HttpStatus.OK));
         }
