@@ -23,10 +23,10 @@ public class MailService {
      *
      * @param javaMailSender
      */
-    @Autowired
-    public MailService(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
+//    @Autowired
+//    public MailService(JavaMailSender javaMailSender) {
+//        this.javaMailSender = javaMailSender;
+//    }
 
     /**
      *

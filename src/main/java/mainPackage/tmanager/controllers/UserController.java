@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -24,7 +26,14 @@ public class UserController {
             return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         } else {
             userService.save(user);
-            return new ResponseEntity(HttpStatus.OK);
+            return ResponseEntity.ok(user);
         }
+    }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity<?> getUser(@PathVariable("id") int id){
+        Optional<User> user = userService.findById(id);
+
+        return ResponseEntity.ok(user);
     }
 }

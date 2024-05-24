@@ -1,10 +1,13 @@
 package mainPackage.tmanager.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import mainPackage.tmanager.models.Project;
 import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.models.User;
 import mainPackage.tmanager.models.UserRoleInProject;
+import mainPackage.tmanager.repositories.ProjectRepository;
 import mainPackage.tmanager.services.ProjectService;
 import mainPackage.tmanager.services.TaskService;
 import mainPackage.tmanager.services.UserRoleInProjectService;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,36 +31,34 @@ public class ProjectController {
     private final ProjectService projectService;
     private final TaskService taskService;
     private final UserService userService;
+    private final ProjectRepository projectRepository;
 
     @Autowired
-    public ProjectController(UserRoleInProjectService userRoleInProjectService, ProjectService projectService, TaskService taskService, UserService userService) {
+    public ProjectController(UserRoleInProjectService userRoleInProjectService, ProjectService projectService, TaskService taskService, UserService userService,
+                             ProjectRepository projectRepository) {
         this.userRoleInProjectService = userRoleInProjectService;
         this.projectService = projectService;
         this.taskService = taskService;
         this.userService = userService;
+        this.projectRepository = projectRepository;
     }
 
     /*
     * Method should be used when person is creating Project,
     * so user automatically becomes an admin
     * */
-    @PostMapping("/new/{userId}")
-    public ResponseEntity<?> createProjectUser(@RequestBody @Valid Project project, BindingResult bindingResult,
-                                               @RequestBody User user) {
-        if (bindingResult.hasErrors()) {
-            ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
-        } else {
+    @PostMapping("/new")
+    public ResponseEntity<?> createProjectUser(@RequestBody Project project) {
 
-                projectService.save(project);
+        projectService.save(project);
 
-                UserRoleInProject userRoleInProject = new UserRoleInProject();
-                userRoleInProject.setUser(user);
-                userRoleInProject.setProject(project);
-                userRoleInProject.setRole(mainPackage.tmanager.enums.UserRoleInProject.ADMIN);
-                userRoleInProjectService.save(userRoleInProject);
+        List<User> userList = project.getUsers();
+        UserRoleInProject userRoleInProject = new UserRoleInProject();
+        userRoleInProject.setUser(userList.get(0));
+        userRoleInProject.setProject(project);
+        userRoleInProject.setRole(mainPackage.tmanager.enums.UserRoleInProject.ADMIN);
+        userRoleInProjectService.save(userRoleInProject);
 
-
-            }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
