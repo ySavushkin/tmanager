@@ -1,10 +1,7 @@
 package mainPackage.tmanager.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.validation.Valid;
+import mainPackage.tmanager.enums.UserRoleInProjectE;
 import mainPackage.tmanager.models.Project;
-import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.models.User;
 import mainPackage.tmanager.models.UserRoleInProject;
 import mainPackage.tmanager.repositories.ProjectRepository;
@@ -15,14 +12,10 @@ import mainPackage.tmanager.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static mainPackage.tmanager.enums.UserRoleInProject.ADMIN;
 
 @RestController
 @RequestMapping("/project")
@@ -56,7 +49,7 @@ public class ProjectController {
         UserRoleInProject userRoleInProject = new UserRoleInProject();
         userRoleInProject.setUser(userList.get(0));
         userRoleInProject.setProject(project);
-        userRoleInProject.setRole(mainPackage.tmanager.enums.UserRoleInProject.ADMIN);
+        userRoleInProject.setRoleInProject(UserRoleInProjectE.ADMIN);
         userRoleInProjectService.save(userRoleInProject);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -75,12 +68,12 @@ public class ProjectController {
 
         if(!userList.isEmpty()){
             for(User u : userList ){
-               u.setRole(mainPackage.tmanager.enums.UserRoleInProject.MEMBER);
+               u.setRole(UserRoleInProjectE.MEMBER);
                 u.getProjects().add(optionalProject.get());
                 userService.save(u);
             }
         } else {
-            user.setRole(mainPackage.tmanager.enums.UserRoleInProject.MEMBER);
+            user.setRole(UserRoleInProjectE.MEMBER);
             user.getProjects().add(optionalProject.get());
             userService.save(user);
         }
@@ -88,4 +81,6 @@ public class ProjectController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
 }

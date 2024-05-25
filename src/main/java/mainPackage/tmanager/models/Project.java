@@ -52,6 +52,11 @@ public class Project {
     )
     private List<User> users;
 
-
-
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id=" + id +
+                ", users=" + users +
+                '}';
+    }
 }

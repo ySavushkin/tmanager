@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mainPackage.tmanager.enums.UserRoleInProject;
+import mainPackage.tmanager.enums.UserRoleInProjectE;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,7 +50,7 @@ public class User {
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private UserRoleInProject role;
+    private UserRoleInProjectE role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Task> tasks;
@@ -58,5 +58,12 @@ public class User {
     @ManyToMany(mappedBy = "users")
     private List<Project> projects;
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }
 

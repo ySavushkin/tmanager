@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mainPackage.tmanager.enums.UserRoleInProjectE;
+
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -29,7 +33,25 @@ public class UserRoleInProject {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "project_role")
-    private mainPackage.tmanager.enums.UserRoleInProject role;
+    private UserRoleInProjectE roleInProject;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserRoleInProject that = (UserRoleInProject) o;
+        return id == that.id && Objects.equals(user, that.user) && Objects.equals(project, that.project);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, user, project);
+    }
+
+    public UserRoleInProject(User user, Project project, UserRoleInProjectE role) {
+        this.user = user;
+        this.project = project;
+        this.roleInProject = role;
+    }
 }
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,7 +24,12 @@ public class UserService {
         userRepository.save(user);
     }
 
+
     public Optional<User> findById(int id) {
         return userRepository.findById(id);
+    }
+
+    public List<User> findAllByIds(List<Integer> collect) {
+        return userRepository.findAllById(collect);
     }
 }

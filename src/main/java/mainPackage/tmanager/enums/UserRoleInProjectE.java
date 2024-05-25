@@ -1,5 +1,5 @@
 package mainPackage.tmanager.enums;
 
-public enum UserRoleInProject {
+public enum UserRoleInProjectE {
     ADMIN,MEMBER,MANAGER
 }
