@@ -87,7 +87,7 @@ public class TaskController {
             return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         } else {
             taskService.save(task);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseEntity(HttpStatus.OK));
+            return ResponseEntity.ok("Task was created");
         }
     }
 
