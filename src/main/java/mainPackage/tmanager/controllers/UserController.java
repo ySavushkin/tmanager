@@ -5,6 +5,8 @@ import mainPackage.tmanager.enums.UserRoleInProjectE;
 import mainPackage.tmanager.models.Project;
 import mainPackage.tmanager.models.User;
 import mainPackage.tmanager.models.UserRoleInProject;
+import mainPackage.tmanager.repositories.UserRepository;
+import mainPackage.tmanager.repositories.UserRoleInProjectRepo;
 import mainPackage.tmanager.requests.InviteUsersRequest;
 import mainPackage.tmanager.services.ProjectService;
 import mainPackage.tmanager.services.UserRoleInProjectService;
@@ -26,12 +28,18 @@ public class UserController {
     private final UserService userService;
     private final ProjectService projectService;
     private final UserRoleInProjectService userRoleInProjectService;
+    private final UserRepository userRepository;
+    private final UserRoleInProjectRepo userRoleInProjectRepo;
 
     @Autowired
-    public UserController(UserService userService, ProjectService projectService, UserRoleInProjectService userRoleInProjectService) {
+    public UserController(UserService userService, ProjectService projectService, UserRoleInProjectService userRoleInProjectService,
+                          UserRepository userRepository,
+                          UserRoleInProjectRepo userRoleInProjectRepo) {
         this.userService = userService;
         this.projectService = projectService;
         this.userRoleInProjectService = userRoleInProjectService;
+        this.userRepository = userRepository;
+        this.userRoleInProjectRepo = userRoleInProjectRepo;
     }
 
     @PostMapping("/create")
@@ -117,13 +125,34 @@ public class UserController {
     }
 
     @PostMapping("/delete-from-project")
-    public ResponseEntity<?> deleteUsersFromProject(@RequestBody User admin, List<User> userList, Project project) {
-        if (!(admin.getRole() == UserRoleInProjectE.ADMIN)) {
-            return ResponseEntity.badRequest().body("You are not an admin ");
+    public ResponseEntity<?> deleteUsersFromProject(@RequestBody InviteUsersRequest inviteUsersRequest) {
+        Optional<User> requester = userService.findById(inviteUsersRequest.getRequester().getId());
+        Optional<Project> project = projectService.findById(inviteUsersRequest.getProject().getId());
+        List<User> usersToBeDeleted = inviteUsersRequest.getUsers();
+        List<User> existingUsersListToBeDeleted = userService.findAllByUsers(usersToBeDeleted);
+        if(project.isPresent()) {
+            Project existingProject = project.get();
+            User existingRequester = requester.get();
+            if (userRoleInProjectService.findAdminByProject(existingProject, UserRoleInProjectE.ADMIN).contains(existingRequester)) {
+                for(User u : existingUsersListToBeDeleted){
+
+                    u.getProjects().remove(existingProject);
+                    userService.save(u);
+
+                    existingProject.getUsers().remove(u);
+                    projectService.save(existingProject);
+
+                    UserRoleInProject userRoleInProject = userRoleInProjectService.findByUserAndProject(u,existingProject);
+                    userRoleInProjectRepo.delete(userRoleInProject);
+                }
+
+            } else {
+                return ResponseEntity.badRequest().body("You are not admin");
+            }
+
         } else {
-            project.getUsers().remove(userList);
-            projectService.save(project);
-            return ResponseEntity.ok("Deleted successfully");
+            return ResponseEntity.badRequest().body("Project not found");
         }
+        return ResponseEntity.ok("Selected users were deleted");
     }
 }
