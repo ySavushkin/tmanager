@@ -9,6 +9,7 @@ import mainPackage.tmanager.requests.InviteUsersRequest;
 import mainPackage.tmanager.services.ProjectService;
 import mainPackage.tmanager.services.UserRoleInProjectService;
 import mainPackage.tmanager.services.UserService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -50,6 +51,35 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    //Метод для админа, метод для назначения менеджеров
+    @PostMapping("/give-role")
+    public ResponseEntity<?> giveRole(@RequestBody InviteUsersRequest inviteUsersRequest){
+        Optional<User> requester = userService.findById(inviteUsersRequest.getRequester().getId());
+        Optional<Project> project = projectService.findById(inviteUsersRequest.getProject().getId());
+        List<User> usersToBecomeManagers = inviteUsersRequest.getUsers();
+        List<User> existingUsersListToBecomeM = userService.findAllByUsers(usersToBecomeManagers);
+
+        if(requester.isPresent() && project.isPresent()){
+            User existingRequester = requester.get();
+            Project existingProject = project.get();
+            System.out.println(existingRequester);
+            System.out.println(existingUsersListToBecomeM);
+            System.out.println(existingProject);
+            if(userRoleInProjectService.findAdminByProject(existingProject, UserRoleInProjectE.ADMIN).contains(existingRequester)){
+                for(User u :existingUsersListToBecomeM){
+
+                    UserRoleInProject existingUserRole = userRoleInProjectService.findByUserAndProject(u, existingProject);
+                    existingUserRole.setRoleInProject(inviteUsersRequest.getUserRoleInProjectE());
+                    userRoleInProjectService.save(existingUserRole);
+                }
+            } else {
+                return ResponseEntity.badRequest().body("You are not admin");
+            }
+        } else {
+            return ResponseEntity.badRequest().body("Requester or project not found");
+        }
+        return ResponseEntity.ok("Success");
+    }
 
     @PostMapping("/invite-users1")
     public ResponseEntity<?> inviteUsers1(@RequestBody InviteUsersRequest inviteRequest) {
@@ -66,21 +96,17 @@ public class UserController {
 
             Project existingProject = projectDB.get();
 
-
+            List<User> existingUsersListToBecomeM = userService.findAllByUsers(userList);
             List<User> existingUsers = existingProject.getUsers();
-            for (User newUser : userList) {
+            for (User newUser : existingUsersListToBecomeM) {
                 if (!existingUsers.contains(newUser)) {
                     existingUsers.add(newUser);
+                    UserRoleInProject userMemberRole = new UserRoleInProject(newUser,existingProject,UserRoleInProjectE.MEMBER);
+                    userRoleInProjectService.save(userMemberRole);
                 }
             }
             existingProject.setUsers(existingUsers);
             projectService.save(existingProject);
-
-
-            for (User newUser : userList) {
-                UserRoleInProject userRoleInProject = new UserRoleInProject(newUser, existingProject, UserRoleInProjectE.MEMBER);
-                userRoleInProjectService.save(userRoleInProject);
-            }
             return ResponseEntity.ok("OK");
         } else {
             return ResponseEntity.badRequest().body("Project not found with ID: " + project.getId());

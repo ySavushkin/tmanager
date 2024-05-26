@@ -1,5 +1,6 @@
 package mainPackage.tmanager.requests;
 
+import mainPackage.tmanager.enums.UserRoleInProjectE;
 import mainPackage.tmanager.models.Project;
 import mainPackage.tmanager.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,15 @@ public class InviteUsersRequest {
     private User requester;
     private List<User> users;
     private Project project;
+
+    private UserRoleInProjectE userRoleInProjectE;
+
+    public InviteUsersRequest(User requester, List<User> users, Project project, UserRoleInProjectE userRoleInProjectE) {
+        this.requester = requester;
+        this.users = users;
+        this.project = project;
+        this.userRoleInProjectE = userRoleInProjectE;
+    }
 
     public InviteUsersRequest(User requester, List<User> users, Project project) {
         this.requester = requester;
@@ -43,6 +53,14 @@ public class InviteUsersRequest {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public UserRoleInProjectE getUserRoleInProjectE() {
+        return userRoleInProjectE;
+    }
+
+    public void setUserRoleInProjectE(UserRoleInProjectE userRoleInProjectE) {
+        this.userRoleInProjectE = userRoleInProjectE;
     }
 }
 

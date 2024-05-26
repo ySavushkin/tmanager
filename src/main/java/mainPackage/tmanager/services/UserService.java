@@ -29,7 +29,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public List<User> findAllByIds(List<Integer> collect) {
-        return userRepository.findAllById(collect);
+
+    public List<User> findAllByUsers(List<User> users) {
+        return userRepository.findAllById(users);
     }
+
+
 }

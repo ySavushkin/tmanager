@@ -42,5 +42,14 @@ public class UserRoleInProjectService {
         return userRoleInProjectRepo.findUsersByProjectAndRoles(project, UserRoleInProjectE.ADMIN, UserRoleInProjectE.MANAGER);
     }
 
+    public List<User> findAdminByProject(Project project, UserRoleInProjectE userRoleInProjectE) {
+        return userRoleInProjectRepo.findAllByProjectAndRoleInProject(project, userRoleInProjectE);
+    }
+
+
+    public UserRoleInProject findByUserAndProject (User user, Project project){
+        return userRoleInProjectRepo.findByUserAndProject(user,project);
+    }
+
 }
 
