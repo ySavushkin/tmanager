@@ -1,4 +1,4 @@
-package mainPackage.tmanager.config;
+package mainPackage.tmanager.configs;
 
 import javax.ws.rs.core.Application;
 import java.util.HashSet;
