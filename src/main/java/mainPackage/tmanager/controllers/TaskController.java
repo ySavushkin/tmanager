@@ -1,6 +1,7 @@
 package mainPackage.tmanager.controllers;
 
 import jakarta.validation.Valid;
+import mainPackage.tmanager.enums.TaskStatus;
 import mainPackage.tmanager.models.AttachedFile;
 import java.nio.file.Files;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -43,52 +45,32 @@ public class TaskController {
         this.projectService = projectService;
     }
 
-    //--------------------------------------------------------------------------------------------------
-//    @PostMapping("/upload-file")
-//    public ResponseEntity<?> uploadFiles(@RequestParam("files") MultipartFile[] files) {
-//        // Определяем директорию, в которую будут загружены файлы
-//
-//        try {
-//
-//            for (MultipartFile file : files) {
-//                processFile(file, new AttachedFile());
-//            }
-//            return ResponseEntity.status(HttpStatus.OK).body(new ResponseEntity(HttpStatus.OK));
-//        } catch (IOException e) {
-//            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(HttpStatus.BAD_REQUEST);
-//        }
-//    }
-//    @PostMapping("/create")
-//    public ResponseEntity<?> createTask(@RequestBody @Valid Task task){
-//            taskService.save(task);
-//            return ResponseEntity.status(HttpStatus.OK).body(new ResponseEntity(HttpStatus.OK));
-//    }
-//    public void processFile(MultipartFile multipartFile, AttachedFile attachedFile) throws IOException {
-//    String fileName = UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
-//    //Добавляем данные в БД
-//    String relativePath = "Files/" + fileName;
-//    attachedFile.setFileName(multipartFile.getOriginalFilename());
-//    attachedFile.setFileType(multipartFile.getContentType());
-//    attachedFile.setFileLink(relativePath);
-//    attachedFile.setFileSize(multipartFile.getSize());
-//    //Отправляем файл в папку Files на хранение
-//    String uploadDirectory = "/Users/rusleak/IdeaDoNotDeleteProjects/tmanager/src/main/resources/Files";
-//    File newFile = new File(uploadDirectory, fileName);
-//    //Отправляет файл в по сути созданную директорию newFile
-//    multipartFile.transferTo(newFile);
-//    //Сохраняем в БД
-//    attachedFileService.save(attachedFile);
-//}
-    //--------------------------------------------------------------------------------------------------
-    @PostMapping("/create")
-    public ResponseEntity<?> createTask(@RequestBody @Valid Task task,
+
+
+    @PostMapping("/create/{projectId}")
+    public ResponseEntity<?> createTask(@PathVariable("projectId") int projectId ,@RequestBody @Valid Task task,
                                         BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(bindingResult.getFieldError().getDefaultMessage());
         } else {
-            taskService.save(task);
+            Optional<Project> optionalProject = projectService.findById(projectId);
+            if(optionalProject.isPresent()){
+                task.setProject(optionalProject.get());
+                task.setTaskStatus(TaskStatus.CREATED);
+                taskService.save(task);
+            } else {
+                return ResponseEntity.badRequest().body("Project not found");
+            }
+
             return ResponseEntity.ok("Task was created");
         }
+    }
+
+    @PostMapping("/change-status")
+    private ResponseEntity<?> changeStatus(@RequestBody Task task){
+
+        taskService.updateStatus(task);
+        return ResponseEntity.ok("Status was updated");
     }
 
     @PostMapping("/upload-file/{taskId}")

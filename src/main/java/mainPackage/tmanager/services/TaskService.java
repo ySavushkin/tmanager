@@ -1,5 +1,6 @@
 package mainPackage.tmanager.services;
 
+import mainPackage.tmanager.enums.TaskStatus;
 import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.models.User;
 import mainPackage.tmanager.repositories.TaskRepository;
@@ -31,6 +32,19 @@ public class TaskService {
     public void save(Task task) {
         task.setCreatedAt(LocalDateTime.now());
         taskRepository.save(task);
+    }
+
+    @Transactional
+    public void updateStatus(Task task){
+        Optional<Task> existingTaskOptional = taskRepository.findById(task.getId());
+        if (existingTaskOptional.isPresent()) {
+            Task existingTask = existingTaskOptional.get();
+            existingTask.setTaskStatus(task.getTaskStatus());
+            existingTask.setStatusUpdatedAt(LocalDateTime.now());
+            taskRepository.save(existingTask);
+        } else {
+            throw new RuntimeException("Task not found");
+        }
     }
 
 
