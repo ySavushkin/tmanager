@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mainPackage.tmanager.enums.DevelopingStatus;
+import mainPackage.tmanager.enums.TaskStatus;
+import mainPackage.tmanager.services.TaskService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,7 +41,15 @@ public class Task {
     private String description;
 
     @Column(name = "status")
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus taskStatus;
+
+    @Column(name = "developing_status")
+    @Enumerated(EnumType.STRING)
+    private DevelopingStatus developingStatus;
+
+    @Column(name = "status_updated_at")
+    private LocalDateTime statusUpdatedAt;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -52,6 +63,7 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     private Project project;
+
 
 }
 
