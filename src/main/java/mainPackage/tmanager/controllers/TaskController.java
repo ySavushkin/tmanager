@@ -1,6 +1,7 @@
 package mainPackage.tmanager.controllers;
 
 import jakarta.validation.Valid;
+import mainPackage.tmanager.enums.DevelopingStatus;
 import mainPackage.tmanager.enums.TaskStatus;
 import mainPackage.tmanager.models.AttachedFile;
 import java.nio.file.Files;
@@ -57,6 +58,7 @@ public class TaskController {
             if(optionalProject.isPresent()){
                 task.setProject(optionalProject.get());
                 task.setTaskStatus(TaskStatus.CREATED);
+                task.setDevelopingStatus(DevelopingStatus.START);
                 taskService.save(task);
             } else {
                 return ResponseEntity.badRequest().body("Project not found");
@@ -65,10 +67,14 @@ public class TaskController {
             return ResponseEntity.ok("Task was created");
         }
     }
+    @PostMapping("change-developing_status")
+    public ResponseEntity<?> changeDevelopingStatus(@RequestBody Task task){
+        taskService.updateDevelopingStatus(task);
+        return ResponseEntity.ok("Status was updated");
+    }
 
     @PostMapping("/change-status")
-    private ResponseEntity<?> changeStatus(@RequestBody Task task){
-
+    public ResponseEntity<?> changeStatus(@RequestBody Task task){
         taskService.updateStatus(task);
         return ResponseEntity.ok("Status was updated");
     }

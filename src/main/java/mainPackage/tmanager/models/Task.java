@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mainPackage.tmanager.enums.DevelopingStatus;
 import mainPackage.tmanager.enums.TaskStatus;
 import mainPackage.tmanager.services.TaskService;
 
@@ -42,6 +43,10 @@ public class Task {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TaskStatus taskStatus;
+
+    @Column(name = "developing_status")
+    @Enumerated(EnumType.STRING)
+    private DevelopingStatus developingStatus;
 
     @Column(name = "status_updated_at")
     private LocalDateTime statusUpdatedAt;

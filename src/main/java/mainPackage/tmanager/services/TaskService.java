@@ -35,6 +35,17 @@ public class TaskService {
     }
 
     @Transactional
+    public void updateDevelopingStatus(Task task){
+        Optional<Task> existingTaskOptional = taskRepository.findById(task.getId());
+        if (existingTaskOptional.isPresent()) {
+            Task existingTask = existingTaskOptional.get();
+            existingTask.setDevelopingStatus(task.getDevelopingStatus());
+            taskRepository.save(existingTask);
+        } else {
+            throw new RuntimeException("Task not found");
+        }
+    }
+    @Transactional
     public void updateStatus(Task task){
         Optional<Task> existingTaskOptional = taskRepository.findById(task.getId());
         if (existingTaskOptional.isPresent()) {
