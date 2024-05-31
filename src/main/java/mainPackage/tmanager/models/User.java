@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 import mainPackage.tmanager.enums.UserRoleInProjectE;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data //Генерирует геттеры, сеттеры, методы toString(), equals() и hashCode() для всех полей класса.
@@ -24,7 +26,7 @@ public class User {
     @Id
     @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @NotNull(message = "Username should be not null")
     @NotEmpty(message = "Username field can't be empty")
@@ -48,15 +50,23 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private UserRoleInProjectE role;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Task> tasks;
 
     @ManyToMany(mappedBy = "users")
     private List<Project> projects;
+
+    public User(String username, String email, String encode) {
+        this.username = username;
+        this.email = email;
+        this.password = encode;
+    }
 
     @Override
     public String toString() {
@@ -65,5 +75,8 @@ public class User {
                 ", username='" + username + '\'' +
                 '}';
     }
-}
 
+    public Set<Role> getRoles() {
+        return roles;
+    }
+}
