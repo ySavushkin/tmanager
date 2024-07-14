@@ -7,6 +7,7 @@ import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import io.swagger.jaxrs.config.BeanConfig;
 
+//http://localhost:8080/swagger-ui/index.html#/
 
 public class SwaggerConfig extends Application {
     public SwaggerConfig() {

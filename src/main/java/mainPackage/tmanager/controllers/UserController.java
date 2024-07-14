@@ -53,13 +53,13 @@ public class UserController {
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<?> getUser(@PathVariable("id") int id) {
+    public ResponseEntity<?> getUser(@PathVariable("id") Long id) {
         Optional<User> user = userService.findById(id);
 
         return ResponseEntity.ok(user);
     }
 
-    //Метод для админа, метод для назначения менеджеров
+    //Метод для админа, метод для назначения менеджеров/модеров
     @PostMapping("/give-role")
     public ResponseEntity<?> giveRole(@RequestBody InviteUsersRequest inviteUsersRequest){
         Optional<User> requester = userService.findById(inviteUsersRequest.getRequester().getId());

@@ -55,32 +55,34 @@ public class ProjectController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-
-    @PostMapping("/attach-people/{projectId}")
-    public ResponseEntity<?> attachPeople(@PathVariable("projectId") int projectId,
-                                          @RequestBody List<User> userList,
-                                          @RequestBody User user) {
-        Optional<Project> optionalProject = projectService.findById(projectId);
-
-        if (optionalProject.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        if(!userList.isEmpty()){
-            for(User u : userList ){
-               u.setRole(UserRoleInProjectE.MEMBER);
-                u.getProjects().add(optionalProject.get());
-                userService.save(u);
-            }
-        } else {
-            user.setRole(UserRoleInProjectE.MEMBER);
-            user.getProjects().add(optionalProject.get());
-            userService.save(user);
-        }
+//TODO починить постмаппинг на прикрипление людей
 
 
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
+//    @PostMapping("/attach-people/{projectId}")
+//    public ResponseEntity<?> attachPeople(@PathVariable("projectId") int projectId,
+//                                          @RequestBody List<User> userList,
+//                                          @RequestBody User user) {
+//        Optional<Project> optionalProject = projectService.findById(projectId);
+//
+//        if (optionalProject.isEmpty()) {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        }
+//
+//        if(!userList.isEmpty()){
+//            for(User u : userList ){
+//               u.setRoles(UserRoleInProjectE.MEMBER);
+//                u.getProjects().add(optionalProject.get());
+//                userService.save(u);
+//            }
+//        } else {
+//            user.setRoles(UserRoleInProjectE.MEMBER);
+//            user.getProjects().add(optionalProject.get());
+//            userService.save(user);
+//        }
+//
+//
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
 
 }
