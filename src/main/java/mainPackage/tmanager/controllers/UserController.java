@@ -59,7 +59,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    //Метод для админа, метод для назначения менеджеров
+    //Метод для админа, метод для назначения менеджеров/модеров
     @PostMapping("/give-role")
     public ResponseEntity<?> giveRole(@RequestBody InviteUsersRequest inviteUsersRequest){
         Optional<User> requester = userService.findById(inviteUsersRequest.getRequester().getId());

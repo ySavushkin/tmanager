@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import mainPackage.tmanager.enums.UserRoleInProjectE;
-
+//TODO Выяснить шо вообще с ролями
 @Entity
 @Data
 @NoArgsConstructor
