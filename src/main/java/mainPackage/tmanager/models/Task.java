@@ -12,6 +12,7 @@ import mainPackage.tmanager.enums.DevelopingStatus;
 import mainPackage.tmanager.enums.TaskStatus;
 import mainPackage.tmanager.services.TaskService;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -64,7 +65,11 @@ public class Task {
     @JoinColumn(name = "project_id", referencedColumnName = "project_id")
     private Project project;
 
+    @Column(name = "ended_at")
+    private LocalDateTime endedAt;
 
+    @Column(name = "duration")
+    private String duration;
 }
 
 

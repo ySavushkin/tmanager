@@ -103,6 +103,7 @@
 			<artifactId>swagger-jersey2-jaxrs</artifactId>
 			<version>1.6.12</version> <!-- Версию можно изменить на актуальную -->
 		</dependency>
+
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>

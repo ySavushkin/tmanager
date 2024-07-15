@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import mainPackage.tmanager.models.Project;
 import mainPackage.tmanager.models.Task;
 import mainPackage.tmanager.models.User;
+import mainPackage.tmanager.repositories.TaskRepository;
 import mainPackage.tmanager.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -36,15 +38,18 @@ public class TaskController {
 
     @Value("${filePath}")
     private String filePath;
+    private final TaskRepository taskRepository;
 
     @Autowired
-    public TaskController(TaskService taskService, AttachedFileService attachedFileService, UserService userService, MailService mailService, ProjectService projectService) {
+    public TaskController(TaskService taskService, AttachedFileService attachedFileService, UserService userService, MailService mailService, ProjectService projectService,
+                          TaskRepository taskRepository) {
         this.taskService = taskService;
         this.attachedFileService = attachedFileService;
         this.userService = userService;
 
         this.mailService = mailService;
         this.projectService = projectService;
+        this.taskRepository = taskRepository;
     }
 
 
@@ -153,11 +158,6 @@ public class TaskController {
             if (existingUserOptional.isPresent()) {
                 User existingUser = existingUserOptional.get();
                 task.setUser(existingUser);
-                //----------------
-                //НУЖНо allow less secure app
-                //НО ЭТА ФУНКЦИЯ ОТКЛЮЧЕНА В гугл
-//                mailService.sendEmail(existingUser);
-                //----------------
                 taskService.save(task); // Сохраняем изменения в БД
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
@@ -167,6 +167,30 @@ public class TaskController {
             return new ResponseEntity<>("Task not found with id: " + taskId, HttpStatus.NOT_FOUND);
         }
     }
+    //TODO почему то Время старта задачи становится таким же как и время конца
+    //Время выполнения записывается в String, только начатые часы, только целые числа
+    //К примеру если задача выполнялась 2 часа 59 минут, то записано будет 2 часа
+    @PostMapping("/finish-task/{taskId}")
+    public ResponseEntity<?> finishTask(@PathVariable("taskId") int taskId){
+        Optional<Task> optionalTask = taskService.findById(taskId);
+        if(optionalTask.isPresent()){
+            Task task = optionalTask.get();
+            task.setTaskStatus(TaskStatus.DONE);
+            task.setDevelopingStatus(DevelopingStatus.ENDED);
+            LocalDateTime endedAt = LocalDateTime.now();
+            task.setEndedAt(endedAt);
+            Duration taskDoingDuration = Duration.between(task.getCreatedAt(), task.getEndedAt());
+            long hours = taskDoingDuration.toHours();
+            String taskDoingDurationStr = String.valueOf(hours);
+            task.setDuration(taskDoingDurationStr);
+            taskRepository.save(task);
+            return ResponseEntity.ok("Task " + task.getName() + " was finished successfully!");
+        } else {
+            return ResponseEntity.badRequest().body("Task id not found");
+        }
+    }
+
+
 
 
 

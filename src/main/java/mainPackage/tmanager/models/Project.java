@@ -1,5 +1,6 @@
 package mainPackage.tmanager.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -41,9 +42,11 @@ public class Project {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<Task> taskList;
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
             name = "project_user",
@@ -51,6 +54,9 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> users;
+
+    @Column(name = "ended_at")
+    private LocalDateTime endedAt;
 
     @Override
     public String toString() {

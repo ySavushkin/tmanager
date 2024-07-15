@@ -18,6 +18,7 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     @Transactional
     public void save(User user){
         user.setCreatedAt(LocalDateTime.now());
